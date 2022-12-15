@@ -1,27 +1,4 @@
 #!/usr/bin/python
-"""
-
-SIP Ping - A diagnostic utility for critical VoIP monitoring
-https://github.com/cathoderaydude/sipping
-Version 1.1
-
-==========================================================================
-
-License:
-This software is licensed under the Mozilla Public License Version 2.0
-The details can be found in the accompanying LICENSE file
-
-==========================================================================
-
-SIP Ping is a tool for monitoring a SIP gateway (PBX, SBC, phone) for deep
-dive diagnostics. Most tools for VoIP monitoring are based on meeting SLA
-figures and providing general "network availability" statistics. SIP Ping
-is for granular troubleshooting.
-
-See http://gekk.info/sipping for more information and suggested usage.
-Commandline flags and defaults are available by running "python sipping.py -h"
-
-"""
 
 from hashlib import md5
 import random
@@ -33,6 +10,7 @@ import os
 import socket
 import json
 import urllib
+import time
 
 # handler for ctrl+c / SIGINT
 # last action before quitting is to write a \n to the end of the output file
@@ -76,16 +54,20 @@ parser.add_argument("host", help="Target SIP device to ping")
 parser.add_argument("-I", metavar="interval", default=1000, help="Interval in milliseconds between pings (default 1000)")
 parser.add_argument("-u", metavar="userid", default="sipping", help="User part of the From header (default sipping)")
 parser.add_argument("-i", metavar="ip", default="*", help="IP to send in the Via header (will TRY to get local IP by default)")
-parser.add_argument("-d", metavar="domain", default="gekk.info", help="Domain part of the From header (needed if your device filters based on domain)")
+parser.add_argument("-d", metavar="domain", default="test", help="Domain part of the From header (needed if your device filters based on domain)")
 parser.add_argument("-p", metavar="port", default=5060, help="Destination port (default 5060)")
 parser.add_argument("--ttl", metavar="ttl", default=70, help="Value to use for the Max-Forwards field (default 70)")
 parser.add_argument("-w", metavar="file", default="[[default]]", help="File to write results to. (default sipping-logs/[ip] - * to disable.")
 parser.add_argument("-t", metavar="timeout", default="1000", help="Time (ms) to wait for response (default 1000)")
-parser.add_argument("-c", metavar="count", default="0", help="Number of pings to send (default infinite)")
+parser.add_argument("-c", metavar="count", default="0", help="Number of pings to send (default 0 infinite)")
 parser.add_argument("-x", nargs="?", default=False, help="Print raw transmitted packets")
 parser.add_argument("-X", nargs="?", default=False, help="Print raw received responses")
 parser.add_argument("-q", nargs="?", default=True, help="Do not print status messages (-x and -X ignore this)")
 parser.add_argument("-S", nargs="?", default=True, help="Do not print loss statistics")
+parser.add_argument("--crun", metavar="count", default=0, help="Count lost the run shell script (default 0 - off)")
+parser.add_argument("--cnew", metavar="count", default=10, help="Number of successful attempts to reset the failure counter(default 10, 0 - off)")
+parser.add_argument("--run", metavar="script", default="./script.sh", help="Path/Name lost shell script (./script.sh))")
+parser.add_argument("--pause", metavar="timeout", default="60", help="Pause after script execution (.default 60 sec.))")
 args = vars(parser.parse_args())
 
 # populate data from commandline
@@ -114,6 +96,13 @@ v_rawsend = args["x"] == None
 v_rawrecv = args["X"] == None
 v_quiet = not args["q"]
 v_nostats = not args["S"]
+v_count = int(args["c"])
+
+v_crun = args["crun"]
+v_run = args["run"]
+v_pause = args["pause"]
+v_cnew = args["cnew"]
+
 if args["w"] == "[[default]]":
 	if not os.path.exists("sipping-logs"): os.mkdir("sipping-logs")
 	v_logpath = "sipping-logs/{ip}.csv".format(ip=v_sbc)
@@ -159,6 +148,9 @@ v_iter = 0
 
 # empty list of last 5 pings
 l_current_results = []
+
+rcount = 0
+rcountold = 0
 
 # start the ping loop
 while 1:
@@ -250,10 +242,21 @@ Content-Length: 0
 		# increment statistics
 		v_lost = v_lost + 1
 		v_current_run_loss = v_current_run_loss + 1
+		
+		rcountold = rcount
+
+		# Run script 
+		if v_crun > 0:
+			if v_lost >= int(v_crun):
+			    v_proc = v_run + " " + str(v_lost)
+			    output = os.system(str(v_proc))
+			    time.sleep(int(v_pause))
+			    #print output
+			    v_lost = 0
 	
 	v_iter = v_iter + 1
 	# if it's been five packets, print stats and write logfile
-	if v_iter > 4:
+	if v_iter > 0:
 		# print stats to screen
 		if not v_nostats:
 			printstats()
@@ -269,3 +272,16 @@ Content-Length: 0
 	
 	# pause for user-requested interval before sending next packet
 	time.sleep(v_interval / 1000.0)
+
+	if v_cnew > 0:
+	    if rcountold > 0:
+		if (rcount - rcountold) >= v_cnew:
+			v_lost = 0
+			rcountold = 0
+
+	if v_count > 0:
+		v_count -= 1
+		if v_count <= 0:
+			break
+
+	rcount += 1
