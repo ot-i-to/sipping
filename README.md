@@ -65,10 +65,4 @@ optional arguments:
  --run script     Path/Name lost shell script (./script.sh))
  --pause timeout  Pause after script execution (.default 60 sec.))
 ```
-  -S [S]           Do not print loss statistics
-  --crun count     Count lost the run shell script (default 0 - off)
-  --cnew count     Number of successful attempts to reset the failure
-                   counter(default 10, 0 - off)
-  --run script     Path/Name lost shell script (./script.sh))
-  --pause timeout  Pause after script execution (.default 60 sec.))
 
