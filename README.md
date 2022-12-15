@@ -25,7 +25,9 @@
 
 [Скачать данную версию утилиту можно тут](https://sysinfo.pro/ru/VoIP/Monitoring/sipping.tar.bz2).
 
-`usage: sipping.py [-h] [-I interval] [-u userid] [-i ip] [-d domain] [-p port]
+--------------------------------------------------------------------------------------------------------------------------
+
+usage: sipping.py [-h] [-I interval] [-u userid] [-i ip] [-d domain] [-p port]
                   [--ttl ttl] [-w file] [-t timeout] [-c count] [-x [X]]
                   [-X [X]] [-q [Q]] [-S [S]] [--crun count] [--cnew count]
                   [--run script] [--pause timeout]
@@ -59,5 +61,5 @@ optional arguments:
   --cnew count     Number of successful attempts to reset the failure
                    counter(default 10, 0 - off)
   --run script     Path/Name lost shell script (./script.sh))
-  --pause timeout  Pause after script execution (.default 60 sec.))`
+  --pause timeout  Pause after script execution (.default 60 sec.))
 
