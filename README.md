@@ -66,3 +66,6 @@ optional arguments:
  --pause timeout  Pause after script execution (.default 60 sec.))
 ```
 
+https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py(https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py)
+https://github.com/ot-i-to/sipping(https://github.com/ot-i-to/sipping)
+
