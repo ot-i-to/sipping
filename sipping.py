@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py
+# https://github.com/ot-i-to/sipping
+
 from hashlib import md5
 import random
 import re
