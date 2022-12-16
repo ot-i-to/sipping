@@ -23,7 +23,7 @@
 Пример запуска:  
 `/usr/share/sipping/sipping.py -p 5060 -i 10.15.1.154:5099 10.15.1.154 -I 60000 -t 10000 -w '/var/log/asterisk/sipping.log' --pause 300 --crun 10 --run '/usr/share/sipping/script.run' -q`
 
-[Скачать данную версию утилиту можно тут](https://sysinfo.pro/ru/VoIP/Monitoring/sipping.tar.bz2).
+[Скачать данную версию утилиту можно тут](https://sysinfo.pro/ru/VoIP/Monitoring/sipping.tar.bz2)
 
 
 ##### Справка:
@@ -66,6 +66,4 @@ optional arguments:
  --pause timeout  Pause after script execution (.default 60 sec.))
 ```
 
-https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py(https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py)
-https://github.com/ot-i-to/sipping(https://github.com/ot-i-to/sipping)
-
+https://sysinfo.pro/ru/VoIP/Monitoring/sipping_py
